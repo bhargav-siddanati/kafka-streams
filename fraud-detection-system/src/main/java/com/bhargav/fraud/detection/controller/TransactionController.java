@@ -15,8 +15,8 @@ import java.util.Random;
 @RequestMapping("/api/transactions")
 @RequiredArgsConstructor
 public class TransactionController {
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final KafkaTemplate<String, Transaction> kafkaTemplate;
+    //private final ObjectMapper objectMapper = new ObjectMapper();
 
     @PostMapping
     public String sendTransaction() throws Exception{
@@ -24,8 +24,8 @@ public class TransactionController {
             String transactionID = "txn_" + System.currentTimeMillis() + "-" + i;
             double amount = 8000 + new Random().nextDouble() * (11000 - 8000);
             Transaction txn = new Transaction(transactionID, "USER_" + i, amount, LocalDateTime.now().toString());
-            String txnJson = objectMapper.writeValueAsString(txn);
-            kafkaTemplate.send("transactions", transactionID, txnJson);
+            // String txnJson = objectMapper.writeValueAsString(txn);
+            kafkaTemplate.send("transactions", transactionID, txn);
         }
         return "Transaction sent to kafka";
     }
