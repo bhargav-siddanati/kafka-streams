@@ -5,12 +5,12 @@ spring:
     bootstrap-servers: localhost:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: com.bhargav.fraud.detection.serde.TransactionSerde
     streams:
       application-id: fraud-detection-streams
       properties:
         default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-        default.value.serde: org.springframework.kafka.support.serializer.JacksonJsonSerde
+        default.value.serde: com.bhargav.fraud.detection.serde.TransactionSerde
 
 server:
   port: 9191
