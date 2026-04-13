@@ -9,10 +9,8 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafkaStreams;
 
 @Configuration
-@EnableKafkaStreams
 @Slf4j
 public class FraudDetectionStreams {
     @Bean
