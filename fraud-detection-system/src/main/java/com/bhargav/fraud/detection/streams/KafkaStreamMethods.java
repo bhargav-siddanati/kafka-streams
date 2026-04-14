@@ -69,22 +69,24 @@ public class KafkaStreamMethods {
 
          */
         // -----------------------------------------------------------
-        Map<String, KStream<String, Transaction>> stringKStreamMap1 = transactions.split().branch((k, v) -> v.amount() > 10000, Branched.as("high-value"))
-                .branch((k, v) -> v.amount() < 10000, Branched.as("low-value")).noDefaultBranch();
+        Map<String, KStream<String, Transaction>> stringKStreamMap = transactions.split()
+                .branch((k, v) -> v.amount() > 10000, Branched.as("high-value"))
+                .branch((k, v) -> v.amount() <= 10000, Branched.as("low-value"))
+                .noDefaultBranch();
 
-        //result.get("high-value").foreach((k, v) -> System.out.println("Processing: " + v));
+        // Process high-value transactions with terminal operation
+        if(stringKStreamMap.get("high-value") != null) {
+            stringKStreamMap.get("high-value")
+                    .peek((key, value) -> System.out.println("High Value - Key: " + key + " Value: " + value))
+                    .to("high-value-topic");
+        }
 
-        // Print high-value transactions
-        stringKStreamMap1.get("high-value").peek((key, value) ->
-                System.out.println("High Value - Key: " + key + " Value: " + value));
-
-        // Print low-value transactions
-        stringKStreamMap1.get("low-value").peek((key, value) ->
-                System.out.println("Low Value - Key: " + key + " Value: " + value));
-
-        Map<String, KStream<String, Transaction>> stringKStreamMap = transactions.split().branch((k, v) -> v.amount() > 10000, Branched.as("high-value"))
-                .branch((k, v) -> v.amount() < 10000, Branched.as("low-value"))
-                .defaultBranch(Branched.as("low-value"));
+        // Process low-value transactions with terminal operation
+        if(stringKStreamMap.get("low-value") != null) {
+            stringKStreamMap.get("low-value")
+                    .peek((key, value) -> System.out.println("Low Value - Key: " + key + " Value: " + value))
+                    .to("low-value-topic");
+        }
 
         /* Group Method */
         transactions.groupBy((k,v) -> v.userId())
